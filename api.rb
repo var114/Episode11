@@ -19,11 +19,7 @@ attr_reader :text, :time, :execution_time, :user
 
   @@log = []
   def self.log_request(time, text, execution_time, user=nil)
-    if (user == nil)
-    @@log << LogRequest.new(time, text, execution_time, user=nil)
-  else
     @@log << LogRequest.new(time, text, execution_time, user)
-    end
   end 
 
   def self.log
@@ -57,5 +53,10 @@ post '/' do
   LogRequest.log_request params.fetch("time"), params.fetch("text"), params.fetch("execution_time"), params.fetch("user")
   @logs = LogRequest.log
   render :rabl, :logs, :format => "json"
-  #insert the record into the inner memory store
+end
+
+get '/hello/:user' do
+  LogRequest.log_request params.fetch("user")
+  @logs = LogRequest.log
+  render :rabl, :logs, :format => "json"
 end
