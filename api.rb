@@ -30,7 +30,7 @@ attr_reader :text, :time, :execution_time
   end
 end
 
-LogRequest.log_request(Time.now, "Do it", "EXECUTE")
+LogRequest.log_request(Time.now, "Do it", Time.now)
 
 
 get '/' do
@@ -39,4 +39,12 @@ get '/' do
 
 end
 
-   
+post '/' do
+  LogRequest.log_request params.fetch("time"), params.fetch("text"), params.fetch("execution_time")
+  @logs = LogRequest.log
+  render :rabl, :logs, :format => "json"
+  #insert the record into the inner memory store
+
+
+
+end

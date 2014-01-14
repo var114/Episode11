@@ -15,32 +15,39 @@ describe "The Api" do
 
 before do 
   LogRequest.clear_log!
-  LogRequest.log_request(6.seconds.ago.utc, "Hello World", "EXECUTE")
+  LogRequest.log_request(6.seconds.ago.utc, "Hello World", 30.seconds.ago.utc)
 end
   it "should return json array of log requests" do
     get "/"
-    puts last_response.body
     json = JSON.parse(last_response.body)
     log_request = json.first["logrequest"]
     log_request.fetch("text").should eq("Hello World")
-    log_request.fetch("execution_time").should eq("EXECUTE")
 
 
     time_in_utc = Time.parse(log_request.fetch("time"))
     time_in_utc.should be_within(1).of(6.seconds.ago.utc)
 
-
+    time_in_mars = Time.parse(log_request.fetch("execution_time"))
+    time_in_mars.should be_within(1).of(30.seconds.ago.utc)
   end
 
-  it "not be oke with /wack" do
-    get "/wack" 
-    last_response.should_not be_ok
+
+
+
+    it "should post a log" do
+    get "/"
+    json = JSON.parse(last_response.body)
+    count = json.count
+    post("/", {time: Time.now, text: 'awesome', execution_time: Time.now})
+    json = JSON.parse(last_response.body)
+    new_count = json.count
+    new_count.should equal(count + 1)
   end
 end
 
 describe LogRequest do #variable that will be logged. 
 
-  let(:subject) { LogRequest.new(45.minutes.ago, "Just Record It", "EXECUTE")}
+  let(:subject) { LogRequest.new(45.minutes.ago, "Just Record It", 30.minutes.ago)}
 
   it "should have the text" do
     subject.text.should eq("Just Record It")
@@ -49,15 +56,15 @@ describe LogRequest do #variable that will be logged.
     subject.time.should be_within(0.01).of(45.minutes.ago)
   end
 
-  it "should EXECUTE" do
-    subject.execution_time.should eq("EXECUTE")
+  it "should execute the time" do
+    subject.execution_time.should be_within(0.01).of(30.minutes.ago)
   end
 
  describe ":log" do #be able to log something 
    before do
     LogRequest.clear_log!
-    LogRequest.log_request(Time.now, "Now", "EXECUTE")
-    LogRequest.log_request(Time.now, "Now", "EXECUTE") #be able to send in a period of time when called
+    LogRequest.log_request(Time.now, "Now", Time.now)
+    LogRequest.log_request(Time.now, "Now", Time.now) #be able to send in a period of time when called
   end
    it "should be an array-like thing" do
     LogRequest.log.count.should eq(2)
