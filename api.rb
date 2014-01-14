@@ -56,6 +56,7 @@ post '/' do
 end
 
 get '/hello/:user' do
+  user = params[:user]
   LogRequest.log_request params.fetch("user")
   @logs = LogRequest.log
   render :rabl, :logs, :format => "json"
