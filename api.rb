@@ -3,36 +3,40 @@ require 'bundler'
 Bundler.require
 
 require 'sinatra'
-require "active_support/all"
+require 'active_support/all'
 
 Rabl.register!
 
+
 class LogRequest
-  attr_reader :text, :time, :created_at
-  def initialize(time, text)
+attr_reader :text, :time, :execution_time
+  def initialize(time, text, execution_time)
     @text = text
     @time = time
-    @created_at = Time.now
+    @execution_time = execution_time
   end
 
   @@log = []
-  def self.log_request(time, text)
-    @@log << LogRequest.new(time, text)
-  end
+  def self.log_request(time, text, execution_time)
+    @@log << LogRequest.new(time, text, execution_time)
+  end 
 
   def self.log
     @@log
   end
 
   def self.clear_log!
-    @@log = []
+   @@log = []
   end
-
 end
 
-LogRequest.log_request Time.now, "Just do it alreay"
+LogRequest.log_request(Time.now, "Do it", "EXECUTE")
+
 
 get '/' do
   @logs = LogRequest.log
   render :rabl, :logs, :format => "json"
+
 end
+
+   
