@@ -31,14 +31,11 @@ end
     time_in_mars.should be_within(1).of(30.seconds.ago.utc)
   end
 
-
-
-
     it "should post a log" do
     get "/"
     json = JSON.parse(last_response.body)
     count = json.count
-    post("/", {time: Time.now, text: 'awesome', execution_time: Time.now})
+    post("/", {time: Time.now, text: 'awesome', execution_time: Time.now, user: '892' })
     json = JSON.parse(last_response.body)
     new_count = json.count
     new_count.should equal(count + 1)
@@ -47,7 +44,7 @@ end
 
 describe LogRequest do #variable that will be logged. 
 
-  let(:subject) { LogRequest.new(45.minutes.ago, "Just Record It", 30.minutes.ago)}
+  let(:subject) { LogRequest.new(45.minutes.ago, "Just Record It", 30.minutes.ago, "9220")}
 
   it "should have the text" do
     subject.text.should eq("Just Record It")
